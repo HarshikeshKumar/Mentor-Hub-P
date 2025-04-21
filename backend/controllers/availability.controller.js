@@ -6,26 +6,38 @@ const createAvailability = async (req, res, next) => {
   const userId = req.user._id;
   const availabilityData = req.body;
 
-  const existingAvailability = await availabilityService.getAvailability(
-    userId
-  );
+  try {
+    const existingAvailability = await availabilityService.getAvailability(
+      userId
+    );
 
-  if (existingAvailability) {
+    let availability;
+    if (existingAvailability) {
+      // update if already exists
+      availability = await availabilityService.updateAvailability(
+        userId,
+        availabilityData
+      );
+    } else {
+      // create if not exists
+      availability = await availabilityService.createAvailability(
+        userId,
+        availabilityData
+      );
+    }
+
+    res.status(httpStatus.ok).json({
+      success: true,
+      message: existingAvailability
+        ? "Availability updated successfully"
+        : "Availability created successfully",
+      availability,
+    });
+  } catch (error) {
     return next(
-      new ApiError(httpStatus.badRequest, "Availability already exists")
+      new ApiError(httpStatus.internalServerError, "Something went wrong")
     );
   }
-
-  const availability = await availabilityService.createAvailability(
-    userId,
-    availabilityData
-  );
-
-  res.status(httpStatus.created).json({
-    success: true,
-    message: "Availability created successfully",
-    availability,
-  });
 };
 
 const getAvailability = async (req, res, next) => {
