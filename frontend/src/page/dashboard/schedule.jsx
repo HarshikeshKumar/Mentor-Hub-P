@@ -3,6 +3,7 @@ import { Calendar, Modal, Button, Checkbox, message } from "antd";
 import moment from "moment";
 import axios from "axios";
 import Dashboard from "./dashboard";
+import AxiosInstances from "../../apiManger";
 
 const Schedule = () => {
   const [selectedDates, setSelectedDates] = useState([]);
@@ -19,7 +20,7 @@ const Schedule = () => {
       const startTime = moment().set({ hour, minute: 0 });
       const endTime = moment().set({ hour, minute: 59 });
       slots.push(
-        `${startTime.format("hh:mm A")} - ${endTime.format("hh:mm A")}`
+        `${startTime.format("hh:mm A")} - ${endTime.format("hh:mm A")}`,
       );
     }
     setAvailableSlots(slots);
@@ -72,20 +73,21 @@ const Schedule = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:5000/v1/availability",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      // const res = await axios.post(
+      //   "http://localhost:5000/v1/availability",
+      //   payload,
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //     },
+      //   }
+      // );
+      const res = await AxiosInstances.post("/availability", payload);
       message.success("Availability saved successfully!");
       setBookedSlots((prev) => [
         ...prev,
         ...selectedDates.flatMap((date) =>
-          selectedSlots.map((slot) => ({ date, slot }))
+          selectedSlots.map((slot) => ({ date, slot })),
         ),
       ]);
       setSelectedDates([]);
@@ -105,7 +107,7 @@ const Schedule = () => {
       return <div className="bg-red-500 text-white p-2">Unavailable</div>;
     }
     const bookedOnThisDay = bookedSlots.filter(
-      (slot) => slot.date === currentDate
+      (slot) => slot.date === currentDate,
     );
     if (bookedOnThisDay.length) {
       return (
@@ -164,7 +166,7 @@ const Schedule = () => {
             {Array.from({ length: 7 }, (_, index) => {
               const date = moment().add(index, "days").format("YYYY-MM-DD");
               const bookedOnDate = bookedSlots.filter(
-                (slot) => slot.date === date
+                (slot) => slot.date === date,
               );
               return (
                 <li key={date} className="flex justify-between p-2">
