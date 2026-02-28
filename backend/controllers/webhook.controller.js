@@ -40,7 +40,6 @@ const moment = require("moment");
 //   handleRazorpayWebhook,
 // };
 
-//ADD..............
 const handleRazorpayWebhook = async (req, res, next) => {
   const { event } = req.body;
   console.log(" Webhook hit hua:", event);
