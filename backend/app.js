@@ -12,16 +12,16 @@ const config = require("./config");
 const { notFound, errorHandler } = require("./middleware/error");
 
 // Middleware to enable CORS (Cross-Origin Resource Sharing)
-// app.use(cors());
-app.use(
-  cors({
-    origin: [
-      "https://your-frontend-vercel-url.vercel.app", // frontend deployed URL
-      "http://localhost:3000", // local dev
-    ],
-    credentials: true, // ✅ allow cookies / JWT
-  }),
-);
+app.use(cors());
+// app.use(
+//   cors({
+//     origin: [
+//       "https://your-frontend-vercel-url.vercel.app", // frontend deployed URL
+//       "http://localhost:3000", // local dev
+//     ],
+//     credentials: true, // ✅ allow cookies / JWT
+//   }),
+// );
 
 // Middleware to parse incoming JSON requests
 app.use(express.json());

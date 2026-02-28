@@ -39,7 +39,7 @@ let AxiosInstances; // Declare a variable to hold the axios instance
         toast.error("Something went wrong"); // Display a generic error message
       }
       throw error; // Throw the error to be handled by the calling function
-    }
+    },
   );
 })();
 
