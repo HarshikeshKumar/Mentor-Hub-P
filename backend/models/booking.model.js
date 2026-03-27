@@ -28,6 +28,12 @@ const bookingSchema = new mongoose.Schema(
     meetingLink: {
       type: String,
     },
+    paymentId: {
+      type: String,
+    },
+    orderId: {
+      type: String,
+    },
     status: {
       type: String,
       enum: ["pending", "confirmed", "cancelled"],
@@ -36,7 +42,7 @@ const bookingSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const BookingModel = mongoose.model("Booking", bookingSchema);

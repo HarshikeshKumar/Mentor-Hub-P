@@ -3,7 +3,7 @@ const config = require("../config");
 
 async function getZoomAuthToken() {
   const auth = Buffer.from(
-    `${config.zoom.clientId}:${config.zoom.clientSecret}`
+    `${config.zoom.clientId}:${config.zoom.clientSecret}`,
   ).toString("base64");
 
   try {
@@ -14,26 +14,31 @@ async function getZoomAuthToken() {
         headers: {
           Authorization: `Basic ${auth}`,
         },
-      }
+      },
     );
 
     return response.data.access_token;
   } catch (error) {
-    console.error(error.response ? error.response.data : error.message);
+    console.error(
+      "Error getting Zoom token:",
+      error.response ? error.response.data : error.message,
+    );
+    throw error;
   }
 }
 
-const createScheduledZoomMeeting = async (startTime, duration) => {
+const createMeeting = async ({ topic, startTime, duration }) => {
   try {
     const accessToken = await getZoomAuthToken();
+
     const response = await axios.post(
-      `https://api.zoom.us/v2/users/me/meetings`,
+      "https://api.zoom.us/v2/users/me/meetings",
       {
-        topic: "Scheduled Meeting", // Meeting topic
-        type: 2, // 2 = Scheduled meeting
-        start_time: startTime, // Start time in ISO 8601 format (e.g., '2024-10-22T14:00:00Z')
-        duration: duration, // Duration in minutes
-        timezone: "Asia/Kolkata", // Set the timezone
+        topic: topic || "Scheduled Meeting",
+        type: 2,
+        start_time: startTime,
+        duration: duration,
+        timezone: "Asia/Kolkata",
         agenda: "This is a scheduled meeting.",
         settings: {
           host_video: true,
@@ -48,18 +53,23 @@ const createScheduledZoomMeeting = async (startTime, duration) => {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
-    return response.data.join_url; // Return the meeting join URL
+    return {
+      join_url: response.data.join_url,
+      start_url: response.data.start_url,
+      meeting_id: response.data.id,
+    };
   } catch (error) {
     console.error(
       "Error creating Zoom meeting:",
-      error.response ? error.response.data : error.message
+      error.response ? error.response.data : error.message,
     );
+    throw error;
   }
 };
 
 module.exports = {
-  createScheduledZoomMeeting,
+  createMeeting,
 };

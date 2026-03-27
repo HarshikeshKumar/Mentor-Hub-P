@@ -8,6 +8,16 @@ const createService = async (req, res, next) => {
 
   const { name, description, duration, price } = req.body;
 
+  // ✅ VALIDATION ADD (IMPORTANT)
+  if (duration < 15 || duration > 180) {
+    return next(
+      new ApiError(
+        httpStatus.badRequest,
+        "Duration must be between 15 and 180 minutes",
+      ),
+    );
+  }
+
   const service = await serviceService.createService({
     mentor: mentorId,
     name,
@@ -28,6 +38,16 @@ const updateService = async (req, res, next) => {
   const mentorId = req.user._id;
   const { name, description, duration, price, active } = req.body;
 
+  //  VALIDATION ADD
+  if (duration < 15 || duration > 180) {
+    return next(
+      new ApiError(
+        httpStatus.badRequest,
+        "Duration must be between 15 and 180 minutes",
+      ),
+    );
+  }
+
   const updatedService = await serviceService.updateService(
     serviceId,
     mentorId,
@@ -37,13 +57,13 @@ const updateService = async (req, res, next) => {
       duration,
       price,
       active,
-    }
+    },
   );
 
   if (!updatedService) {
     throw new ApiError(
       httpStatus.notFound,
-      "Service not found or you don't have permission to update it"
+      "Service not found or you don't have permission to update it",
     );
   }
 

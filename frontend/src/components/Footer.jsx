@@ -17,9 +17,13 @@ const Footer = () => {
             |{" "}
             <a href="#" className="hover:text-[#00DFBD]">
               LinkedIn
+            </a>{" "}
+            |{" "}
+            <a href="#" className="hover:text-[#00DFBD]">
+              GitHub
             </a>
           </p>
-          <p className="mt-4">© 2024 MentorHub. All Rights Reserved.</p>
+          <p className="mt-4">© 2025 MentorHub. All Rights Reserved.</p>
         </div>
       </footer>
     </div>

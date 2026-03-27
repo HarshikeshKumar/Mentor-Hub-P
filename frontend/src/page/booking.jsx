@@ -44,16 +44,6 @@ const Booking = () => {
     getServiceData();
   }, [id]);
 
-  // const onBookServiceClick = async () => {
-  //   const res = await booking.bookService({
-  //     serviceId: id,
-  //     dateAndTime: selectedSlot,
-  //   });
-  //   handlePayment(res.data.order.id, (response) => {
-  //     navigate("/success");
-  //   });
-  // };
-
   const onBookServiceClick = async () => {
     try {
       const res = await booking.bookService({
@@ -61,12 +51,20 @@ const Booking = () => {
         dateAndTime: selectedSlot,
       });
 
-      handlePayment(res?.data?.order?.id, () => {
+      const bookingId = res?.data?.booking?._id;
+      const orderId = res?.data?.order?.id;
+
+      handlePayment(orderId, async (response) => {
+        await booking.confirmBooking({
+          bookingId,
+          paymentId: response.razorpay_payment_id,
+          orderId: response.razorpay_order_id,
+        });
+
         navigate("/success");
       });
     } catch (error) {
       console.error("Booking failed:", error);
-      alert(error?.response?.data?.message || "Booking failed");
     }
   };
 

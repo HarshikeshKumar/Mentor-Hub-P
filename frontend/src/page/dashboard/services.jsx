@@ -2,22 +2,21 @@ import React, { useEffect, useState } from "react";
 import Dashboard from "./dashboard";
 import ServiceCard from "../../components/ServiceCard";
 import service from "../../apiManger/service";
-import { Button, Input, Modal, Form, Spin } from "antd"; // Ant Design components for form, modal, and message
+import { Button, Input, Modal, Form, Spin } from "antd";
 import toast from "react-hot-toast";
 import { FiPlus } from "react-icons/fi";
 
 const Services = () => {
   const [services, setServices] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
-  const [editingService, setEditingService] = useState(null); // State for the service being edited
-  const [loading, setLoading] = useState(true); // Loading state
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingService, setEditingService] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch all services
   useEffect(() => {
     const fetchServices = async () => {
       setLoading(true);
       try {
-        const response = await service.getAllServices(); // Handle async call
+        const response = await service.getAllServices();
         setServices(response?.data?.services);
       } catch (error) {
         console.error("Error fetching services:", error);
@@ -26,36 +25,35 @@ const Services = () => {
       }
     };
 
-    fetchServices(); // Call the function to fetch services
+    fetchServices();
   }, []);
 
-  // Handle form submission to create a new service
   const handleCreateService = async (values) => {
     setLoading(true);
     try {
       const response = await service.createService(values);
-      setServices((prevServices) => [...prevServices, response?.data?.service]); // Add new service to the list
-      setIsModalVisible(false); // Close the modal after creating service
+      setServices((prevServices) => [...prevServices, response?.data?.service]);
+      setIsModalVisible(false);
       toast.success("Service created successfully!");
     } catch (error) {
       console.error("Error creating service:", error);
+      toast.error("Failed to create service. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle form submission to edit an existing service
   const handleEditService = async (values) => {
     setLoading(true);
     try {
       const response = await service.editService(editingService._id, values);
       setServices((prevServices) =>
         prevServices.map((servic) =>
-          servic._id === editingService._id ? response.data.service : servic
-        )
-      ); // Update the edited service in the list
-      setIsModalVisible(false); // Close the modal after editing service
-      setEditingService(null); // Reset editing state
+          servic._id === editingService._id ? response.data.service : servic,
+        ),
+      );
+      setIsModalVisible(false);
+      setEditingService(null);
       toast.success("Service updated successfully!");
     } catch (error) {
       console.error("Error editing service:", error);
@@ -66,8 +64,8 @@ const Services = () => {
   };
 
   const handleEdit = (service) => {
-    setEditingService(service); // Set the selected service for editing
-    setIsModalVisible(true); // Open the modal for editing
+    setEditingService(service);
+    setIsModalVisible(true);
   };
 
   return (
@@ -76,7 +74,6 @@ const Services = () => {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold">Your Services</h2>
 
-          {/* Button to open the modal for creating a new service */}
           <Button
             className="!rounded "
             type="primary"
@@ -86,19 +83,18 @@ const Services = () => {
           </Button>
         </div>
 
-        {/* Form modal for creating or editing a service */}
         <Modal
           title={editingService ? "Edit Service" : "Create New Service"}
           open={isModalVisible}
           onCancel={() => {
             setIsModalVisible(false);
-            setEditingService(null); // Reset editing state if modal is closed
+            setEditingService(null);
           }}
           footer={null}
         >
           <Form
             onFinish={editingService ? handleEditService : handleCreateService}
-            initialValues={editingService} // Prefill form with service data if editing
+            initialValues={editingService}
           >
             <Form.Item
               label="Name"
@@ -109,6 +105,7 @@ const Services = () => {
             >
               <Input />
             </Form.Item>
+
             <Form.Item
               label="Description"
               name="description"
@@ -121,6 +118,7 @@ const Services = () => {
             >
               <Input.TextArea />
             </Form.Item>
+
             <Form.Item
               label="Duration"
               name="duration"
@@ -129,10 +127,24 @@ const Services = () => {
                   required: true,
                   message: "Please enter the service duration!",
                 },
+                {
+                  validator: (_, value) => {
+                    if (!value) return Promise.resolve();
+                    if (value < 15 || value > 180) {
+                      return Promise.reject(
+                        new Error(
+                          "Duration must be between 15 and 180 minutes",
+                        ),
+                      );
+                    }
+                    return Promise.resolve();
+                  },
+                },
               ]}
             >
-              <Input type="number" />
+              <Input type="number" min={15} max={180} />
             </Form.Item>
+
             <Form.Item
               label="Price"
               name="price"
@@ -142,20 +154,20 @@ const Services = () => {
             >
               <Input type="number" />
             </Form.Item>
+
             <Button type="primary" htmlType="submit">
               {editingService ? "Save Changes" : "Create Service"}
             </Button>
           </Form>
         </Modal>
 
-        {/* Display services in a grid */}
         <Spin spinning={loading}>
           <div className="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-3">
             {services?.map((servic) => (
               <ServiceCard
                 key={servic._id}
                 service={servic}
-                onEdit={() => handleEdit(servic)} // Pass the service to the edit function
+                onEdit={() => handleEdit(servic)}
               />
             ))}
           </div>
