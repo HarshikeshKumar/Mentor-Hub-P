@@ -27,7 +27,7 @@ const Booking = () => {
     setServiceData(res?.data?.service);
     getMentorAvailability(
       res?.data?.service?.mentor,
-      res?.data?.service?.duration
+      res?.data?.service?.duration,
     );
     setLoadingService(false);
   };
@@ -44,14 +44,30 @@ const Booking = () => {
     getServiceData();
   }, [id]);
 
+  // const onBookServiceClick = async () => {
+  //   const res = await booking.bookService({
+  //     serviceId: id,
+  //     dateAndTime: selectedSlot,
+  //   });
+  //   handlePayment(res.data.order.id, (response) => {
+  //     navigate("/success");
+  //   });
+  // };
+
   const onBookServiceClick = async () => {
-    const res = await booking.bookService({
-      serviceId: id,
-      dateAndTime: selectedSlot,
-    });
-    handlePayment(res.data.order.id, (response) => {
-      navigate("/success");
-    });
+    try {
+      const res = await booking.bookService({
+        serviceId: id,
+        dateAndTime: selectedSlot,
+      });
+
+      handlePayment(res?.data?.order?.id, () => {
+        navigate("/success");
+      });
+    } catch (error) {
+      console.error("Booking failed:", error);
+      alert(error?.response?.data?.message || "Booking failed");
+    }
   };
 
   return (
