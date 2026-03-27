@@ -73,16 +73,16 @@ const Schedule = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:5000/v1/availability",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        },
-      );
-      // const res = await AxiosInstances.post("/availability", payload);
+      // const res = await axios.post(
+      //   "http://localhost:5000/v1/availability",
+      //   payload,
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //     },
+      //   },
+      // );
+      const res = await AxiosInstances.post("/availability", payload);
       message.success("Availability saved successfully!");
       setBookedSlots((prev) => [
         ...prev,
